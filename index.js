@@ -1,9 +1,45 @@
 const WebSocket = require('ws')
 const Express = require('express')
 const fs = require('fs')
+const satanizeHTML = require('sanitize-html')
 const App = Express()
 
 process.on('uncaughtException', err => {})
+
+class ProtoParser {
+    static writeString(packet, string){
+        for(let i = 0; i < string.length; i++) packet.push(string.charCodeAt(i))
+        packet.push(0)
+        return packet
+    }
+    static readString(view, offset){
+        let res = ''
+        while(true){
+            const char = view.getUint8(offset++)
+            if(char == 0) break
+            res += String.fromCharCode(char)
+        }
+        return {res, offset}
+    }
+    static parseIncomingMessage(view, offset){
+        let data = ProtoParser.readString(view, offset)
+        const name = data.res
+        offset = data.offset
+        data = ProtoParser.readString(view, offset)
+        const message = data.res
+        offset = data.offset
+        return {name, message}
+    }
+    static repackAndPreventXSS(msg){
+        let data = ProtoParser.parseIncomingMessage(new DataView(new Uint8Array(msg).buffer), 1)
+        data.name = satanizeHTML(data.name)
+        data.message = satanizeHTML(data.message)
+        let packet = [0]
+        packet = ProtoParser.writeString(packet, data.name)
+        packet = ProtoParser.writeString(packet, data.message)
+        return new Uint8Array(packet)
+    }
+}
 
 class HexDumper {
     static ArrayToHexDump(msg){
@@ -34,6 +70,7 @@ class ChatServer {
             socket.on('message', msg => {
                 const id = socket.id
                 console.log(`Got New Message From: ${socket._socket.remoteAddress}, HexDump [${HexDumper.ArrayToHexDump(msg)}]`)
+                msg = ProtoParser.repackAndPreventXSS(msg)
                 for(let i = 0; i < this.sockets.length; i++){
                     if(this.sockets[i].id != id && this.sockets[i]._socket.remoteAddress != undefined){
                         this.sockets[i].send(msg)
