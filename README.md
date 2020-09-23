@@ -2,7 +2,7 @@
 Install
 
 npm install express,
-npm install ws, npm install sanitize-html
+npm install ws, npm install sanitize-html, npm install uuidv4
 
 Running -> node index.js
 
