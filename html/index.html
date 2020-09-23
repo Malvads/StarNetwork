@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+        <title>
+            The Center Node Example.
+        </title>
+    </head>
+
+    <body>
+        <script src='client.js'></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+        <style>
+        div.textarea {
+            border: 1px inset #ccc;
+            background-color: white;
+            font: small courier, monospace black;
+            width: 500px;
+            height: 300px; 
+            overflow: auto; 
+        }
+        </style>
+        <center>
+            <h1>The Star Network</h1>
+            <br>
+            <center>
+                <img src='https://lh5.googleusercontent.com/Q7K1EfVNJ59Cn77XKfmXVPij-Wh22eEswwmvwLsyQvhFil0aouLzCuQQ2A2FybqAHLdrseNTJgaVAtWGb0S3qVx5TRdq_RVdvLcKR-9t8OYxrxlRStpymjoG-N8F1NR28Q'></center></img>
+            </center>
+            <br>
+            <center>
+            <div class="alert alert-primary" style='width:50%;' role="alert">
+                Una red en forma de estrella, es aquella en la cual, un nodo central, interconecta a los demas nodos entre si.
+            </div>
+            </center>
+            <center>
+                <div class="alert alert-primary" style='width:50%;' role="alert">
+                    En este ejemplo, he programado un pequeño chat utilizando un servidor <b>WebSocket</b> el cual,
+                    interconectara a todos los usuarios de chat intercambiando mensajes entre si, al igual, en el output
+                    de la consola del servidor podremos ver los distintos mensajes que recibe y/o envia el servidor a cada cliente.
+                    Se puede ver el codigo fuente <b><a href='https://github.com/Malvads/StarNetwork'>aquí</a></b>
+                </div>
+            </center>
+            <br>
+            <center>
+            <h2>
+                Example Chat
+            </h2>
+            <div class="form-group">
+                <div id='chat' class="form-control textarea"  style='width:50%;height:300px;' id="exampleFormControlTextarea1" rows="3"></div>
+                Name: <input id='name' class="form-control" style='width:20%;'>
+                Message: <input id='message' class="form-control" style='width:50%;'>
+                <br>
+                <button id="sendmessage" class="btn btn-success"><b>send</b></button>
+            </div>
+            </center>
+            <center>
+            <h2>
+                Incoming Messages (HexDump)
+            </h2>
+            <div class="form-control textarea" id='incoming' style='width:50%;height:300px;'></div>
+            </center>
+            <center>
+            <h2>
+                OutGoing Messages (HexDump)
+            </h2>
+            <div class="form-control textarea" id='outgoing' style='width:50%;height:300px;'></div>
+            </center>
+        </center>
+        <br>
+        <br>
+    </body>
+</html>
