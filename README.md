@@ -1,8 +1,8 @@
 # StarNetwork
 Install
 
-npm install express
-npm install ws
+npm install express,
+npm install ws, npm install sanitize-html
 
 Running -> node index.js
 
