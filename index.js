@@ -13,7 +13,7 @@ class HexDumper {
             res += msg[i].toString(16)
             res += ' '
         }
-        return msg
+        return res
     }
 }
 
