@@ -1,10 +1,12 @@
 class ChatController {
     static addMessageSendedByMe(message){
+        message = DOMPurify.sanitize(message, {ALLOWED_TAGS: []})
         document.getElementById('chat').innerHTML += `<div class="alert alert-success" role="alert">
             <b>Me</b> - ${message}
         </div>`        
     }
     static addMessageSendedByOther(message){
+        message = DOMPurify.sanitize(message, {ALLOWED_TAGS: []})
         document.getElementById('chat').innerHTML += `<div class="alert alert-dark" role="alert">
             <b>${message.sender}</b> - ${message.content}
         </div>` 
