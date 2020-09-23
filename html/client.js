@@ -1,14 +1,33 @@
 class ChatController {
-    static addMessageSendedByMe(message){
+    static addMessageSendedByMe(message, isPrivate, tSocket){
         message = DOMPurify.sanitize(message, {ALLOWED_TAGS: []})
+        if(isPrivate){
+            tSocket = DOMPurify.sanitize(tSocket, {ALLOWED_TAGS: []})
+        }
+        let HTML = ''
+        if(!isPrivate){
+            HTML = `Me`
+        } else {
+            HTML = `Me sended private message to: ${tSocket}`
+        }
         document.getElementById('chat').innerHTML += `<div class="alert alert-success" role="alert">
-            <b>Me</b> - ${message}
+            <b>${HTML}</b> - ${message}
         </div>`        
     }
     static addMessageSendedByOther(message){
-        message = DOMPurify.sanitize(message, {ALLOWED_TAGS: []})
+        message.sender = DOMPurify.sanitize(message.sender, {ALLOWED_TAGS: []})
+        message.content = DOMPurify.sanitize(message.content, {ALLOWED_TAGS: []})
+        message.socketId = DOMPurify.sanitize(message.socketId, {ALLOWED_TAGS: []})
         document.getElementById('chat').innerHTML += `<div class="alert alert-dark" role="alert">
-            <b>${message.sender}</b> - ${message.content}
+            <b>${message.sender} - socketId: ${message.socketId}</b> - ${message.content}
+        </div>` 
+    }
+    static addMessageSendedByUniquesocket(message){
+        message.sender = DOMPurify.sanitize(message.sender, {ALLOWED_TAGS: []})
+        message.content = DOMPurify.sanitize(message.content, {ALLOWED_TAGS: []})
+        message.socketId = DOMPurify.sanitize(message.socketId, {ALLOWED_TAGS: []})
+        document.getElementById('chat').innerHTML += `<div class="alert alert-warning" role="alert">
+            <b>${message.sender} - socketId: ${message.socketId}</b> - ${message.content}
         </div>` 
     }
 }
@@ -46,34 +65,65 @@ class ProtoParser {
         }
         return {res, offset}
     }
-    static parseIncomingMessage(view, offset){
+    static parseIncomingMessage(view, offset, isPrivate){
         let data = ProtoParser.readString(view, offset)
         const name = data.res
         offset = data.offset
         data = ProtoParser.readString(view, offset)
         const message = data.res
         offset = data.offset
+        data = ProtoParser.readString(view, offset)
+        const socketId = data.res
+        offset = data.offset
+        console.log(socketId)
         Dumper.ArrayToHexIncomingDump(new Uint8Array(view.buffer))
-        ChatController.addMessageSendedByOther({
-            sender:name,
-            content: message
-        })
+        
+        if(!isPrivate){
+            ChatController.addMessageSendedByOther({
+                sender:name,
+                content: message,
+                socketId: socketId
+            })
+        } else {
+            ChatController.addMessageSendedByUniquesocket({
+                sender:name,
+                content: message,
+                socketId: socketId
+            })
+        }
     }
 }
 
 class ProtoSender {
-    static sendNewChatMessage(){
-        const packet = []
-        packet.push(0)
-        const nickname = document.getElementById('name').value
-        const message = document.getElementById('message').value
-        for(let i = 0; i < nickname.length; i++) packet.push(nickname.charCodeAt(i))
-        packet.push(0)
-        for(let i = 0; i < message.length; i++) packet.push(message.charCodeAt(i))
-        packet.push(0)
-        Dumper.ArrayToHexOutgoingDump(packet)
-        ChatController.addMessageSendedByMe(document.getElementById('message').value)
-        window.client.doSafeSend(new Uint8Array(packet))
+    static sendNewChatMessage(isPrivate){
+        if(!isPrivate){
+            const packet = []
+            packet.push(0)
+            const nickname = document.getElementById('name').value
+            const message = document.getElementById('message').value
+            for(let i = 0; i < nickname.length; i++) packet.push(nickname.charCodeAt(i))
+            packet.push(0)
+            for(let i = 0; i < message.length; i++) packet.push(message.charCodeAt(i))
+            packet.push(0)
+            Dumper.ArrayToHexOutgoingDump(packet)
+            ChatController.addMessageSendedByMe(document.getElementById('message').value)
+            window.client.doSafeSend(new Uint8Array(packet))
+        } else {
+            const packet = []
+            packet.push(1)
+            const nickname = document.getElementById('name').value
+            const message = document.getElementById('message').value
+            const targetSocket = document.getElementById('socketid').value
+            for(let i = 0; i < nickname.length; i++) packet.push(nickname.charCodeAt(i))
+            packet.push(0)
+            for(let i = 0; i < message.length; i++) packet.push(message.charCodeAt(i))
+            packet.push(0)
+            for(let i = 0; i < targetSocket.length; i++) packet.push(targetSocket.charCodeAt(i))
+            packet.push(0)
+            Dumper.ArrayToHexOutgoingDump(packet)
+            ChatController.addMessageSendedByMe(document.getElementById('message').value, true, targetSocket)
+            window.client.doSafeSend(new Uint8Array(packet))
+        }
     }
 }
 
@@ -109,6 +159,9 @@ class Client {
             case 0:
                 ProtoParser.parseIncomingMessage(message, offset)
                 break
+            case 1:
+                ProtoParser.parseIncomingMessage(message, offset, true)
+                break;
         }
     }
     onerror(){
@@ -140,5 +193,8 @@ function init(){
     window.client = new Client(8081)
     document.getElementById('sendmessage').onclick = function(){
         ProtoSender.sendNewChatMessage()
+    }
+    document.getElementById('sendmessageprivate').onclick = function(){
+        ProtoSender.sendNewChatMessage(true)
     }
 }
