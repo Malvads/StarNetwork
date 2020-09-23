@@ -8,6 +8,6 @@ Running -> node index.js
 
 Access -> localhost:8080/index
 
-¿Why you developded this project?
+¿Why you developed this project?
 
-Just for school purpouses and for explaining The Start Networks.
+Just for school purposes and for explaining The Star Networks.
