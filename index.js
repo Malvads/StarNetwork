@@ -35,8 +35,9 @@ class ChatServer {
                 const id = socket.id
                 console.log(`Got New Message From: ${socket._socket.remoteAddress}, HexDump [${HexDumper.ArrayToHexDump(msg)}]`)
                 for(let i = 0; i < this.sockets.length; i++){
-                    if(this.sockets[i].id != id){
+                    if(this.sockets[i].id != id && this.sockets[i]._socket.remoteAddress != undefined){
                         this.sockets[i].send(msg)
+                        console.log(`Server Sended Message to : ${this.sockets[i]._socket.remoteAddress}, HexDump [${HexDumper.ArrayToHexDump(msg)}]`)
                     }
                 }
             })
