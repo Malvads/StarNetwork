@@ -27,7 +27,7 @@ class ChatController {
         message.content = DOMPurify.sanitize(message.content, {ALLOWED_TAGS: []})
         message.socketId = DOMPurify.sanitize(message.socketId, {ALLOWED_TAGS: []})
         document.getElementById('chat').innerHTML += `<div class="alert alert-warning" role="alert">
-            <b>${message.sender} - socketId: ${message.socketId}</b> - ${message.content}
+            <b>${message.sender} - Private message from socketId: ${message.socketId}</b> - ${message.content}
         </div>` 
     }
 }
